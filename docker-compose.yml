@@ -62,3 +62,19 @@ services:
     - "traefik.frontend.entryPoints=http,https"
     - "traefik.frontend.redirect.entryPoint=https"
     restart: unless-stopped
+
+  ftp:
+    image: delfer/alpine-ftp-server:latest
+    networks:
+    - web
+    volumes:
+    - ./www:/data:rw
+    ports:
+    - "2121:21"
+    - "21000-21010:21000-21010"
+    environment:
+    - "USERS=FTPUSER|FTPPASS|/data"
+    - "ADDRESS=FTPHOST"
+    - "MIN_PORT=21000"
+    - "MAX_PORT=21010"
+    restart: unless-stopped
