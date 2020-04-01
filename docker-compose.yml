@@ -1,0 +1,64 @@
+version: '3'
+
+networks:
+  web:
+    external: true
+  backend:
+
+volumes:
+  DATABASE-VOLUME-NAME:
+    external: true
+
+services:
+  php:
+    image: php:7.4.4-apache
+    depends_on:
+    - database
+    networks:
+    - web
+    - backend
+    env_file: config.env
+    expose:
+    - "80"
+    volumes:
+    - ./www:/var/www/html/:rw
+    labels:
+    - "traefik.enable=true"
+    - "traefik.docker.network=web"
+    - "traefik.protocol=http"
+    - "traefik.port=80"
+    - "traefik.frontend.rule=Host:HOSTNAME"
+    - "traefik.frontend.entryPoints=http,https"
+    - "traefik.frontend.redirect.entryPoint=https"
+    restart: unless-stopped
+
+  database:
+    image: mysql:5.7.29
+    networks:
+    - backend
+    env_file: config.env
+    volumes:
+    - DATABASE-VOLUME-NAME:/var/lib/mysql:rw
+    restart: unless-stopped
+
+  database-manager:
+    image: phpmyadmin/phpmyadmin:latest
+    depends_on:
+    - database
+    networks:
+    - web
+    - backend
+    env_file: config.env
+    environment:
+    - "PMA_HOST=database"
+    expose:
+    - "80"
+    labels:
+    - "traefik.enable=true"
+    - "traefik.docker.network=web"
+    - "traefik.protocol=http"
+    - "traefik.port=80"
+    - "traefik.frontend.rule=Host:HOSTNAME"
+    - "traefik.frontend.entryPoints=http,https"
+    - "traefik.frontend.redirect.entryPoint=https"
+    restart: unless-stopped
