@@ -1,2 +1,3 @@
-# Website-LampSetup
-Simple LAMP setup via Docker Compose.
+# Simple LAMP setup
+
+Very simple LAMP setup with Docker Compose.
